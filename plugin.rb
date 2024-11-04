@@ -8,7 +8,11 @@
 # The ask theme can then use this information to render links to sites
 
 after_initialize do
-  add_to_serializer(:user_card, :ai_stream_conversation_unique_id) do
-    object.custom_fields["ai-stream-conversation-unique-id"]
-  end
+  add_to_serializer(
+    :user_card,
+    :ai_stream_conversation_unique_id,
+    include_condition: -> do
+      scope&.user&.admin
+    end
+  ) { object.custom_fields["ai-stream-conversation-unique-id"] }
 end
