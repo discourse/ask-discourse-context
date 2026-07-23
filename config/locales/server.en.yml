@@ -1,0 +1,3 @@
+en:
+  ask_discourse_context:
+    sync_failed: "The Admin Assistant chat could not be synchronized."
