@@ -7,8 +7,6 @@
 
 module ::AskDiscourseContext
   PLUGIN_NAME = "ask-discourse-context"
-  ADMIN_ASSISTANT_AGENT_ID = 2
-  ADMIN_ASSISTANT_USER_ID = -1206
   # Source IDs make snapshot reconciliation idempotent without exposing metadata in PM bodies.
   MESSAGE_ID_CUSTOM_FIELD = "ask_discourse_context_admin_assistant_message_id"
   MESSAGE_ROLE_CUSTOM_FIELD = "ask_discourse_context_admin_assistant_message_role"

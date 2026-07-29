@@ -6,12 +6,16 @@ RSpec.describe AskDiscourseContext::AdminAssistantChatsController do
   fab!(:assistant_user) do
     Fabricate(
       :user,
-      id: AskDiscourseContext::ADMIN_ASSISTANT_USER_ID,
+      id: SiteSetting.ask_discourse_context_admin_assistant_user_id,
       username: "ask_admin_assistant",
     )
   end
   fab!(:assistant_agent) do
-    Fabricate(:ai_agent, id: AskDiscourseContext::ADMIN_ASSISTANT_AGENT_ID, user: assistant_user)
+    Fabricate(
+      :ai_agent,
+      id: SiteSetting.ask_discourse_context_admin_assistant_agent_id,
+      user: assistant_user,
+    )
   end
 
   let(:external_id) { "admin-assistant-0123456789abcdef0123456789abcdef" }
@@ -412,6 +416,53 @@ RSpec.describe AskDiscourseContext::AdminAssistantChatsController do
       expect([first_topic.first_post.user_id, second_topic.first_post.user_id].uniq).to eq(
         [staged_fields.pick(:user_id)],
       )
+    end
+
+    it "uses the configured Admin Assistant agent and user" do
+      configured_user = Fabricate(:bot, username: "configured_assistant")
+      configured_agent = Fabricate(:ai_agent, id: 123_456, user: configured_user)
+      SiteSetting.ask_discourse_context_admin_assistant_user_id = configured_user.id
+      SiteSetting.ask_discourse_context_admin_assistant_agent_id = configured_agent.id
+      sign_in(admin)
+      messages = [
+        message(
+          external_id: 1,
+          role: "admin",
+          raw: "How do I configure this?",
+          created_at: started_at,
+        ),
+        message(
+          external_id: 2,
+          role: "assistant",
+          raw: "Open the settings page.",
+          created_at: started_at + 1.minute,
+        ),
+      ]
+
+      sync_chat(messages: messages)
+
+      topic = Topic.find_by!(external_id: external_id)
+      assistant_post = source_post(topic, 2)
+      expect(response).to have_http_status(:no_content)
+      expect(assistant_post.user).to eq(configured_user)
+    end
+
+    it "rejects an agent that does not belong to the configured user" do
+      SiteSetting.ask_discourse_context_admin_assistant_user_id = Fabricate(:bot).id
+      sign_in(admin)
+      messages = [
+        message(
+          external_id: 1,
+          role: "admin",
+          raw: "How do I configure this?",
+          created_at: started_at,
+        ),
+      ]
+
+      sync_chat(messages: messages)
+
+      expect(response).to have_http_status(:forbidden)
+      expect(Topic.exists?(external_id: external_id)).to eq(false)
     end
 
     it "rejects invalid roles, duplicate IDs, and out-of-order timestamps" do

@@ -142,11 +142,12 @@ module AskDiscourseContext
       end
 
       def fetch_agent
-        AiAgent.find_by(id: ADMIN_ASSISTANT_AGENT_ID)
+        AiAgent.find_by(id: SiteSetting.ask_discourse_context_admin_assistant_agent_id)
       end
 
       def agent_can_receive_chat(agent:)
-        agent.user_id == ADMIN_ASSISTANT_USER_ID && agent.user&.active? && agent.user.bot?
+        agent.user_id == SiteSetting.ask_discourse_context_admin_assistant_user_id &&
+          agent.user&.active? && agent.user.bot?
       end
 
       def create_staged_user(params:)
