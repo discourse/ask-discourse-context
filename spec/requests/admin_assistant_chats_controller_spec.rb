@@ -23,6 +23,8 @@ RSpec.describe AskDiscourseContext::AdminAssistantChatsController do
   let(:title) { "Admin Assistant chat with source admin" }
   let(:started_at) { Time.utc(2026, 7, 23, 12) }
 
+  before { SiteSetting.ask_discourse_context_admin_assistant_chat_sync_enabled = true }
+
   def message(external_id:, role:, raw:, created_at:, updated_at: created_at, deleted_at: nil)
     {
       external_id: external_id.to_s,
@@ -62,6 +64,24 @@ RSpec.describe AskDiscourseContext::AdminAssistantChatsController do
   end
 
   describe "#update" do
+    it "is unavailable when Admin Assistant chat synchronization is disabled" do
+      SiteSetting.ask_discourse_context_admin_assistant_chat_sync_enabled = false
+      sign_in(admin)
+      messages = [
+        message(
+          external_id: 1,
+          role: "admin",
+          raw: "How do I configure this?",
+          created_at: started_at,
+        ),
+      ]
+
+      sync_chat(messages: messages)
+
+      expect(response).to have_http_status(:not_found)
+      expect(Topic.exists?(external_id: external_id)).to eq(false)
+    end
+
     it "requires an admin" do
       messages = [
         message(
