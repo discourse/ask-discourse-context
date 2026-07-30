@@ -1,0 +1,8 @@
+en:
+  site_settings:
+    ask_discourse_context_admin_assistant_chat_sync_enabled: "Allow Admin Assistant chat snapshots to be synchronized into private messages."
+    ask_discourse_context_admin_assistant_user_id: "User ID that authors imported Admin Assistant replies. The user must be an active bot configured on {{setting:ask_discourse_context_admin_assistant_agent_id}}."
+    ask_discourse_context_admin_assistant_agent_id: "AI agent ID used for imported Admin Assistant chats. Its configured user must match {{setting:ask_discourse_context_admin_assistant_user_id}}."
+
+  ask_discourse_context:
+    sync_failed: "The Admin Assistant chat could not be synchronized."

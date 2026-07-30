@@ -1,0 +1,10 @@
+ask_discourse_context:
+  ask_discourse_context_admin_assistant_chat_sync_enabled:
+    default: false
+  ask_discourse_context_admin_assistant_user_id:
+    type: integer
+    default: -1206
+    min: -2000000000
+  ask_discourse_context_admin_assistant_agent_id:
+    type: integer
+    default: 2
