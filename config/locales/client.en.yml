@@ -1,0 +1,8 @@
+en:
+  admin_js:
+    admin:
+      api:
+        scopes:
+          descriptions:
+            ask_discourse_context:
+              sync_admin_assistant_chats: "Synchronize Admin Assistant chat snapshots into private messages"
