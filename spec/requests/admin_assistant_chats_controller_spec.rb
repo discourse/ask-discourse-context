@@ -3,13 +3,7 @@
 RSpec.describe AskDiscourseContext::AdminAssistantChatsController do
   fab!(:admin)
   fab!(:regular_user, :user)
-  fab!(:assistant_user) do
-    Fabricate(
-      :user,
-      id: SiteSetting.ask_discourse_context_admin_assistant_user_id,
-      username: "ask_admin_assistant",
-    )
-  end
+  fab!(:assistant_user) { Fabricate(:bot, username: "ask_admin_assistant") }
   fab!(:assistant_agent) do
     Fabricate(
       :ai_agent,
@@ -23,7 +17,10 @@ RSpec.describe AskDiscourseContext::AdminAssistantChatsController do
   let(:title) { "Admin Assistant chat with source admin" }
   let(:started_at) { Time.utc(2026, 7, 23, 12) }
 
-  before { SiteSetting.ask_discourse_context_admin_assistant_chat_sync_enabled = true }
+  before do
+    SiteSetting.ask_discourse_context_admin_assistant_chat_sync_enabled = true
+    SiteSetting.ask_discourse_context_admin_assistant_user_id = assistant_user.id
+  end
 
   def message(external_id:, role:, raw:, created_at:, updated_at: created_at, deleted_at: nil)
     {
